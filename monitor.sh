@@ -50,8 +50,15 @@ do
     notify "<code>$NOW</code>"$'\n'"Current Txs: $TOTAL_TXS"
     echo "$NOW - Current Txs: $TOTAL_TXS"
   else
-    ((TX_STUCK++))
-    notify "<code>$NOW</code>"$'\n'"Got stuck $TX_STUCK times at TX: $TOTAL_TXS"
-    echo "$NOW - Got stuck $TX_STUCK times at TX: $TOTAL_TXS, notifying.."
+    if [ "$TX_STUCK" -gt "5" ]; then
+      TX_STUCK=0
+      notify "<code>$NOW</code>"$'\n'"The node is stuck. Restarting node.."
+      echo "$NOW - The node is stuck. Restarting node.."
+      docker restart sui
+    else
+      ((TX_STUCK++))
+      notify "<code>$NOW</code>"$'\n'"Got stuck $TX_STUCK times at TX: $TOTAL_TXS"
+      echo "$NOW - Got stuck $TX_STUCK times at TX: $TOTAL_TXS, notifying.."
+    fi
   fi
 done
